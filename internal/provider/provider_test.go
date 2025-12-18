@@ -3,6 +3,7 @@ package provider
 import (
 	"os"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
@@ -31,6 +32,8 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("PORKBUN_TEST_DOMAIN"); v == "" {
 		t.Fatal("PORKBUN_TEST_DOMAIN must be set for acceptance tests")
 	}
+	// Add delay between tests to avoid Porkbun API rate limiting
+	time.Sleep(2 * time.Second)
 }
 
 // TestProvider_HasResources verifies the provider has the expected resources
