@@ -27,25 +27,32 @@ This is a Terraform/OpenTofu provider for managing DNS records on [Porkbun](http
 
 For more details, see [Porkbun's API documentation](https://porkbun.com/api/json/v3/documentation).
 
-## Building the Provider
+## Installation
+
+### From GitHub Releases (Recommended)
+
+1. Download the latest release for your platform from [GitHub Releases](https://github.com/neenaoffline/porkbun-terraform-provider/releases)
+
+2. Extract and install:
+   ```bash
+   # Linux (amd64)
+   unzip terraform-provider-porkbun_*_linux_amd64.zip
+   mkdir -p ~/.terraform.d/plugins/github.com/neenaoffline/porkbun/0.1.0/linux_amd64/
+   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/github.com/neenaoffline/porkbun/0.1.0/linux_amd64/terraform-provider-porkbun
+   
+   # macOS (arm64/Apple Silicon)
+   unzip terraform-provider-porkbun_*_darwin_arm64.zip
+   mkdir -p ~/.terraform.d/plugins/github.com/neenaoffline/porkbun/0.1.0/darwin_arm64/
+   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/github.com/neenaoffline/porkbun/0.1.0/darwin_arm64/terraform-provider-porkbun
+   ```
+
+### Building from Source
 
 ```bash
-go build -o terraform-provider-porkbun
+git clone https://github.com/neenaoffline/porkbun-terraform-provider.git
+cd porkbun-terraform-provider
+make install
 ```
-
-## Installing the Provider
-
-### Local Installation
-
-1. Build the provider
-2. Create the plugin directory:
-   ```bash
-   mkdir -p ~/.terraform.d/plugins/registry.terraform.io/neena/porkbun/0.1.0/linux_amd64/
-   ```
-3. Copy the binary:
-   ```bash
-   cp terraform-provider-porkbun ~/.terraform.d/plugins/registry.terraform.io/neena/porkbun/0.1.0/linux_amd64/
-   ```
 
 ## Usage
 
@@ -55,7 +62,7 @@ go build -o terraform-provider-porkbun
 terraform {
   required_providers {
     porkbun = {
-      source  = "neena/porkbun"
+      source  = "github.com/neenaoffline/porkbun"
       version = "0.1.0"
     }
   }
