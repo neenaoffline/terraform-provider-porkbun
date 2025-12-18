@@ -21,6 +21,7 @@ type Client struct {
 	secretAPIKey string
 	httpClient   *http.Client
 	mu           sync.Mutex // ensures only one API call at a time
+	lastRequest  time.Time  // tracks when last request was made
 }
 
 // NewClient creates a new Porkbun API client
@@ -92,11 +93,26 @@ type RetrieveDNSRecordsResponse struct {
 	Records []DNSRecord `json:"records"`
 }
 
+const (
+	// minRequestInterval is the minimum time between API requests to avoid rate limiting
+	minRequestInterval = 1 * time.Second
+)
+
 // doRequest performs an HTTP request to the Porkbun API
 // It uses a mutex to ensure only one request is made at a time
+// and enforces a minimum interval between requests to avoid rate limiting
 func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	// Enforce minimum interval between requests
+	if !c.lastRequest.IsZero() {
+		elapsed := time.Since(c.lastRequest)
+		if elapsed < minRequestInterval {
+			time.Sleep(minRequestInterval - elapsed)
+		}
+	}
+	c.lastRequest = time.Now()
 
 	url := c.baseURL + endpoint
 
