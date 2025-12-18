@@ -94,44 +94,67 @@ type RetrieveDNSRecordsResponse struct {
 
 // doRequest performs an HTTP request to the Porkbun API
 // It uses a mutex to ensure only one request is made at a time
+// and retries on 503 errors with exponential backoff
 func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	url := c.baseURL + endpoint
 
-	var reqBody io.Reader
+	var jsonBody []byte
+	var err error
 	if body != nil {
-		jsonBody, err := json.Marshal(body)
+		jsonBody, err = json.Marshal(body)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal request body: %w", err)
 		}
-		reqBody = bytes.NewBuffer(jsonBody)
 	}
 
-	req, err := http.NewRequest(method, url, reqBody)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+	// Retry with exponential backoff for rate limiting (503 errors)
+	maxRetries := 5
+	baseDelay := 2 * time.Second
+
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		var reqBody io.Reader
+		if jsonBody != nil {
+			reqBody = bytes.NewBuffer(jsonBody)
+		}
+
+		req, err := http.NewRequest(method, url, reqBody)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create request: %w", err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("failed to execute request: %w", err)
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("failed to read response body: %w", err)
+		}
+
+		// Retry on 503 Service Unavailable (rate limiting)
+		if resp.StatusCode == http.StatusServiceUnavailable {
+			if attempt < maxRetries-1 {
+				delay := baseDelay * time.Duration(1<<attempt) // exponential backoff
+				time.Sleep(delay)
+				continue
+			}
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(respBody))
+		}
+
+		return respBody, nil
 	}
 
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("API returned status %d: %s", resp.StatusCode, string(respBody))
-	}
-
-	return respBody, nil
+	return nil, fmt.Errorf("max retries exceeded")
 }
 
 // Ping tests the API connection
