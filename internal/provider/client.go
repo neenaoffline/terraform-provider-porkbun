@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -19,6 +20,7 @@ type Client struct {
 	apiKey       string
 	secretAPIKey string
 	httpClient   *http.Client
+	mu           sync.Mutex // ensures only one API call at a time
 }
 
 // NewClient creates a new Porkbun API client
@@ -91,7 +93,11 @@ type RetrieveDNSRecordsResponse struct {
 }
 
 // doRequest performs an HTTP request to the Porkbun API
+// It uses a mutex to ensure only one request is made at a time
 func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	url := c.baseURL + endpoint
 
 	var reqBody io.Reader
