@@ -6,7 +6,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
-	"github.com/hashicorp/terraform-plugin-testing/terraform"
 )
 
 // testDomain is the domain used for acceptance testing
@@ -45,9 +44,3 @@ func TestProvider_HasResources(t *testing.T) {
 	}
 }
 
-// testAccCheckDestroy is a helper function to verify resources are destroyed
-func testAccCheckDestroy(s *terraform.State) error {
-	// The testing framework handles destroy verification automatically
-	// This is a placeholder for any custom destroy verification logic
-	return nil
-}
