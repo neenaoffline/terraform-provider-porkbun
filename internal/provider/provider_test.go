@@ -33,7 +33,7 @@ func testAccPreCheck(t *testing.T) {
 		t.Fatal("PORKBUN_TEST_DOMAIN must be set for acceptance tests")
 	}
 	// Add delay between tests to avoid Porkbun API rate limiting
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 }
 
 // TestProvider_HasResources verifies the provider has the expected resources
