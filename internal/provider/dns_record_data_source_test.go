@@ -45,7 +45,7 @@ func TestAccDNSRecordDataSource(t *testing.T) {
 }
 
 func testAccDNSRecordDataSourceConfig() string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_ds" {
   domain  = %[1]q
   name    = "tftest-datasource"

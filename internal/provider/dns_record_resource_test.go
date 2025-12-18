@@ -236,7 +236,7 @@ func TestAccDNSRecordResource_CustomTTL(t *testing.T) {
 // Config helper functions
 
 func testAccDNSRecordResourceConfig_A(name, ip string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test" {
   domain  = %[1]q
   name    = %[2]q
@@ -248,7 +248,7 @@ resource "porkbun_dns_record" "test" {
 }
 
 func testAccDNSRecordResourceConfig_AAAA(name, ip string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_aaaa" {
   domain  = %[1]q
   name    = %[2]q
@@ -260,7 +260,7 @@ resource "porkbun_dns_record" "test_aaaa" {
 }
 
 func testAccDNSRecordResourceConfig_CNAME(name, target string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_cname" {
   domain  = %[1]q
   name    = %[2]q
@@ -272,7 +272,7 @@ resource "porkbun_dns_record" "test_cname" {
 }
 
 func testAccDNSRecordResourceConfig_TXT(name, value string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_txt" {
   domain  = %[1]q
   name    = %[2]q
@@ -284,7 +284,7 @@ resource "porkbun_dns_record" "test_txt" {
 }
 
 func testAccDNSRecordResourceConfig_MX(name, target, priority string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_mx" {
   domain  = %[1]q
   name    = %[2]q
@@ -297,7 +297,7 @@ resource "porkbun_dns_record" "test_mx" {
 }
 
 func testAccDNSRecordResourceConfig_RootTXT(value string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_root" {
   domain  = %[1]q
   name    = ""
@@ -309,7 +309,7 @@ resource "porkbun_dns_record" "test_root" {
 }
 
 func testAccDNSRecordResourceConfig_WithNotes(name, ip, notes string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_notes" {
   domain  = %[1]q
   name    = %[2]q
@@ -322,7 +322,7 @@ resource "porkbun_dns_record" "test_notes" {
 }
 
 func testAccDNSRecordResourceConfig_CustomTTL(name, ip, ttl string) string {
-	return fmt.Sprintf(`
+	return providerConfig + fmt.Sprintf(`
 resource "porkbun_dns_record" "test_ttl" {
   domain  = %[1]q
   name    = %[2]q

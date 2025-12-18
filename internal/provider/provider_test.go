@@ -22,6 +22,17 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 	"porkbun": providerserver.NewProtocol6WithError(New("test")()),
 }
 
+// providerConfig is used to prefix test configs with the required terraform block
+const providerConfig = `
+terraform {
+  required_providers {
+    porkbun = {
+      source = "registry.terraform.io/neena/porkbun"
+    }
+  }
+}
+`
+
 func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("PORKBUN_API_KEY"); v == "" {
 		t.Fatal("PORKBUN_API_KEY must be set for acceptance tests")
