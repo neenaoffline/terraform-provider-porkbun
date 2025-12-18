@@ -6,7 +6,7 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/neena/terraform-provider-porkbun/internal/provider"
+	"github.com/neenaoffline/terraform-provider-porkbun/internal/provider"
 )
 
 var version = "dev"

@@ -1,4 +1,4 @@
-module github.com/neena/terraform-provider-porkbun
+module github.com/neenaoffline/terraform-provider-porkbun
 
 go 1.24.0
 
