@@ -63,7 +63,7 @@ terraform {
   required_providers {
     porkbun = {
       source  = "neenaoffline/porkbun"
-      version = "~> 0.2"
+      version = "~> 0.3"
     }
   }
 }
