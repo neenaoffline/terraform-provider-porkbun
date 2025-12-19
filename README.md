@@ -233,7 +233,7 @@ Manages the name servers for a domain.
 | Attribute     | Type         | Required | Description |
 |---------------|--------------|----------|-------------|
 | `domain`      | string       | Yes      | The domain name (e.g., `example.com`) |
-| `nameservers` | list(string) | Yes      | List of name server hostnames |
+| `nameservers` | set(string) | Yes      | Set of name server hostnames |
 
 ### Attribute Reference
 

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -29,7 +30,7 @@ type DomainNameServersResource struct {
 type DomainNameServersResourceModel struct {
 	ID          types.String   `tfsdk:"id"`
 	Domain      types.String   `tfsdk:"domain"`
-	NameServers []types.String `tfsdk:"nameservers"`
+	NameServers types.Set      `tfsdk:"nameservers"`
 }
 
 func (r *DomainNameServersResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -54,8 +55,8 @@ func (r *DomainNameServersResource) Schema(ctx context.Context, req resource.Sch
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"nameservers": schema.ListAttribute{
-				Description: "List of name servers for the domain. If you want to use Porkbun's name servers, use: curitiba.ns.porkbun.com, fortaleza.ns.porkbun.com, maceio.ns.porkbun.com, salvador.ns.porkbun.com",
+			"nameservers": schema.SetAttribute{
+				Description: "Set of name servers for the domain. If you want to use Porkbun's name servers, use: curitiba.ns.porkbun.com, fortaleza.ns.porkbun.com, maceio.ns.porkbun.com, salvador.ns.porkbun.com",
 				Required:    true,
 				ElementType: types.StringType,
 			},
@@ -92,11 +93,18 @@ func (r *DomainNameServersResource) Create(ctx context.Context, req resource.Cre
 		return
 	}
 
-	// Convert nameservers to []string
-	nameservers := make([]string, len(data.NameServers))
-	for i, ns := range data.NameServers {
+	// Convert nameservers set to []string
+	var nsElements []types.String
+	resp.Diagnostics.Append(data.NameServers.ElementsAs(ctx, &nsElements, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	nameservers := make([]string, len(nsElements))
+	for i, ns := range nsElements {
 		nameservers[i] = ns.ValueString()
 	}
+	sort.Strings(nameservers)
 
 	tflog.Debug(ctx, "Updating domain name servers", map[string]interface{}{
 		"domain":      data.Domain.ValueString(),
@@ -135,11 +143,17 @@ func (r *DomainNameServersResource) Read(ctx context.Context, req resource.ReadR
 		return
 	}
 
-	// Convert to types.String slice
-	data.NameServers = make([]types.String, len(nameservers))
+	// Convert to types.Set
+	nsValues := make([]types.String, len(nameservers))
 	for i, ns := range nameservers {
-		data.NameServers[i] = types.StringValue(ns)
+		nsValues[i] = types.StringValue(ns)
 	}
+	nsSet, diags := types.SetValueFrom(ctx, types.StringType, nsValues)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+	data.NameServers = nsSet
 
 	// Save updated data into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
@@ -155,11 +169,18 @@ func (r *DomainNameServersResource) Update(ctx context.Context, req resource.Upd
 		return
 	}
 
-	// Convert nameservers to []string
-	nameservers := make([]string, len(data.NameServers))
-	for i, ns := range data.NameServers {
+	// Convert nameservers set to []string
+	var nsElements []types.String
+	resp.Diagnostics.Append(data.NameServers.ElementsAs(ctx, &nsElements, false)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	nameservers := make([]string, len(nsElements))
+	for i, ns := range nsElements {
 		nameservers[i] = ns.ValueString()
 	}
+	sort.Strings(nameservers)
 
 	tflog.Debug(ctx, "Updating domain name servers", map[string]interface{}{
 		"domain":      data.Domain.ValueString(),
@@ -216,16 +237,21 @@ func (r *DomainNameServersResource) ImportState(ctx context.Context, req resourc
 		return
 	}
 
-	// Convert to types.String slice
+	// Convert to types.Set
 	nsValues := make([]types.String, len(nameservers))
 	for i, ns := range nameservers {
 		nsValues[i] = types.StringValue(ns)
+	}
+	nsSet, diags := types.SetValueFrom(ctx, types.StringType, nsValues)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	data := DomainNameServersResourceModel{
 		ID:          types.StringValue(domain),
 		Domain:      types.StringValue(domain),
-		NameServers: nsValues,
+		NameServers: nsSet,
 	}
 
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
