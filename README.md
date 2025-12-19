@@ -37,13 +37,13 @@ For more details, see [Porkbun's API documentation](https://porkbun.com/api/json
    ```bash
    # Linux (amd64)
    unzip terraform-provider-porkbun_*_linux_amd64.zip
-   mkdir -p ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.0/linux_amd64/
-   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.0/linux_amd64/terraform-provider-porkbun
+   mkdir -p ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.1/linux_amd64/
+   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.1/linux_amd64/terraform-provider-porkbun
    
    # macOS (arm64/Apple Silicon)
    unzip terraform-provider-porkbun_*_darwin_arm64.zip
-   mkdir -p ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.0/darwin_arm64/
-   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.0/darwin_arm64/terraform-provider-porkbun
+   mkdir -p ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.1/darwin_arm64/
+   mv terraform-provider-porkbun_* ~/.terraform.d/plugins/registry.terraform.io/neenaoffline/porkbun/0.3.1/darwin_arm64/terraform-provider-porkbun
    ```
 
 ### Building from Source
